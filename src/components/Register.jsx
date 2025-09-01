@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,Link } from "react-router-dom";
 import { registerUser } from "../services/authService"; // Axios API call
 
 export default function Register() {
@@ -10,9 +10,9 @@ export default function Register() {
     email: "",
     password: "",
     bloodType: "",
-    role: "Donor",
     age: "",
     contactNumber: "",
+    userRole: "",
   });
 
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -49,9 +49,8 @@ export default function Register() {
     setIsLoading(true);
     setError("");
 
-    // Basic validation
-    const { fullName, email, password, bloodType, role, age, contactNumber } = formData;
-    if (!fullName || !email || !password || !bloodType || !role || !age || !contactNumber) {
+    const { fullName, email, password, bloodType, age, contactNumber, userRole } = formData;
+    if (!fullName || !email || !password || !bloodType || !age || !contactNumber || !userRole) {
       setError("Please fill in all fields.");
       setIsLoading(false);
       return;
@@ -62,9 +61,9 @@ export default function Register() {
       Email: email,
       Password: password,
       BloodType: bloodType,
-      Role: role,
       Age: parseInt(age),
       ContactNumber: contactNumber,
+      UserRole: userRole,
     };
 
     try {
@@ -84,12 +83,10 @@ export default function Register() {
     }
   };
 
-  const navigateToLogin = () => {
-    navigate("/login");
-  };
+
+  
 
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
-  const roleOptions = ["Donor", "Receiver", "Admin"];
 
   return (
     <div className="fixed inset-0 w-full h-full overflow-hidden">
@@ -119,7 +116,7 @@ export default function Register() {
             )}
 
             <div className="space-y-3">
-              {["fullName", "email", "password", "bloodType", "role", "age", "contactNumber"].map((field) => (
+              {["fullName", "email", "password", "bloodType", "age", "contactNumber", "userRole"].map((field) => (
                 <div key={field} className="space-y-1.5">
                   <label
                     htmlFor={field}
@@ -127,9 +124,7 @@ export default function Register() {
                       focusedField === field ? "text-blue-600" : "text-gray-600"
                     }`}
                   >
-                    {field
-                      
-                      .replace(/^./, (str) => str.toUpperCase())}
+                    {field.replace(/^./, (str) => str.toUpperCase())}
                   </label>
 
                   {field === "bloodType" ? (
@@ -149,7 +144,7 @@ export default function Register() {
                         </option>
                       ))}
                     </select>
-                  ) : field === "role" ? (
+                  ) : field === "userRole" ? (
                     <select
                       id={field}
                       name={field}
@@ -159,11 +154,9 @@ export default function Register() {
                       onBlur={() => setFocusedField("")}
                       className="w-full px-4 py-2.5 text-sm bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-lg text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none transition-all shadow-sm"
                     >
-                      {roleOptions.map((role) => (
-                        <option key={role} value={role}>
-                          {role}
-                        </option>
-                      ))}
+                      <option value="">Select User Role</option>
+                      <option value="donor">Donor</option>
+                      <option value="recipient">Recipient</option>
                     </select>
                   ) : (
                     <input
@@ -193,17 +186,13 @@ export default function Register() {
             </div>
 
             <div className="text-center pt-2">
-              <span className="text-xs text-gray-600">
-                Already have an account?{" "}
-              </span>
-              <button
-                type="button"
-                onClick={navigateToLogin}
-                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
-                disabled={isLoading}
-              >
-                Sign In
-              </button>
+              <span className="text-xs text-gray-600">Already have an account? </span>
+                 <Link
+    to="/login" // 👈 Use the "to" prop to specify the destination
+    className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+  >
+    Sign In
+  </Link>
             </div>
           </form>
         </div>
@@ -211,3 +200,4 @@ export default function Register() {
     </div>
   );
 }
+
