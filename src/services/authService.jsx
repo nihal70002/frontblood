@@ -1,8 +1,7 @@
 import axios from "axios";
 
-// ⚡ Make sure this port matches launchSettings.json in your API
-// Example: "applicationUrl": "https://localhost:7298;http://localhost:5298"
-const API_URL = "https://localhost:7298/api/Accounts"; 
+// ✅ Use the correct base URL from Swagger
+const API_URL = "http://localhost:5181/api/Accounts";
 
 // ✅ Register user
 export const registerUser = async (data) => {
@@ -19,7 +18,7 @@ export const registerUser = async (data) => {
   }
 };
 
-// ✅ Login user (make sure you implement [HttpPost("login")] in AccountsController)
+// ✅ Login user
 export const loginUser = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/login`, data, {

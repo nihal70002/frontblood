@@ -75,9 +75,9 @@ export default function Login() {
         if (role === "admin") {
           navigate("/admin");
         } else if (role === "donor") {
-          navigate("/donor-dashboard");
+          navigate("/");
         } else if (role === "receiver") {
-          navigate("/receiver-dashboard");
+          navigate("/");
         } else {
           navigate("/");
         }

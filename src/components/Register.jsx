@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { registerUser } from "../services/authService"; // Axios API call
 
 export default function Register() {
@@ -56,6 +56,7 @@ export default function Register() {
       return;
     }
 
+    // ✅ FIXED: Changed UserRole to Role and ensure proper capitalization
     const backendData = {
       FullName: fullName,
       Email: email,
@@ -63,10 +64,11 @@ export default function Register() {
       BloodType: bloodType,
       Age: parseInt(age),
       ContactNumber: contactNumber,
-      UserRole: userRole,
+      Role: userRole, // ✅ Changed from "UserRole" to "Role"
     };
 
     try {
+      console.log("Sending data to backend:", backendData); // ✅ Debug log
       const response = await registerUser(backendData);
 
       if (response.Message === "Registration successful" || response.message === "Registration successful") {
@@ -76,15 +78,12 @@ export default function Register() {
         setError(response.Message || response.message || "Registration failed.");
       }
     } catch (err) {
-      console.error(err);
-      setError("An error occurred. Please try again.");
+      console.error("Registration error:", err); // ✅ Better error logging
+      setError(err.Message || "An error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
-
-
-  
 
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -124,7 +123,7 @@ export default function Register() {
                       focusedField === field ? "text-blue-600" : "text-gray-600"
                     }`}
                   >
-                    {field.replace(/^./, (str) => str.toUpperCase())}
+                    {field === "userRole" ? "User Role" : field.replace(/^./, (str) => str.toUpperCase())}
                   </label>
 
                   {field === "bloodType" ? (
@@ -136,6 +135,7 @@ export default function Register() {
                       onFocus={() => setFocusedField(field)}
                       onBlur={() => setFocusedField("")}
                       className="w-full px-4 py-2.5 text-sm bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-lg text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none transition-all shadow-sm"
+                      required
                     >
                       <option value="">Select Blood Type</option>
                       {bloodGroups.map((bg) => (
@@ -153,22 +153,26 @@ export default function Register() {
                       onFocus={() => setFocusedField(field)}
                       onBlur={() => setFocusedField("")}
                       className="w-full px-4 py-2.5 text-sm bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-lg text-gray-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none transition-all shadow-sm"
+                      required
                     >
                       <option value="">Select User Role</option>
-                      <option value="donor">Donor</option>
-                      <option value="recipient">Recipient</option>
+                      <option value="Donor">Donor</option>        {/* ✅ Fixed: "donor" → "Donor" */}
+                      <option value="Receiver">Receiver</option>   {/* ✅ Fixed: "recipient" → "Receiver" */}
                     </select>
                   ) : (
                     <input
                       id={field}
                       name={field}
-                      type={field === "password" ? "password" : field === "age" ? "number" : "text"}
+                      type={field === "password" ? "password" : field === "age" ? "number" : field === "email" ? "email" : "text"}
                       value={formData[field]}
                       onChange={handleInputChange}
                       onFocus={() => setFocusedField(field)}
                       onBlur={() => setFocusedField("")}
-                      placeholder={`Enter your ${field}`}
+                      placeholder={`Enter your ${field === "userRole" ? "role" : field}`}
                       className="w-full px-4 py-2.5 text-sm bg-white/80 backdrop-blur-sm border-2 border-gray-200 rounded-lg text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 focus:outline-none transition-all shadow-sm disabled:opacity-50"
+                      required
+                      {...(field === "age" && { min: "18", max: "100" })}
+                      {...(field === "contactNumber" && { pattern: "[0-9]{10}" })}
                     />
                   )}
                 </div>
@@ -178,7 +182,7 @@ export default function Register() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full px-6 py-3 text-base font-bold text-white bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-lg hover:scale-105 transition-transform cursor-pointer disabled:opacity-50"
+                  className="w-full px-6 py-3 text-base font-bold text-white bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg shadow-lg hover:scale-105 transition-transform cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? "Creating Account..." : "Sign Up"}
                 </button>
@@ -187,12 +191,12 @@ export default function Register() {
 
             <div className="text-center pt-2">
               <span className="text-xs text-gray-600">Already have an account? </span>
-                 <Link
-    to="/login" // 👈 Use the "to" prop to specify the destination
-    className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
-  >
-    Sign In
-  </Link>
+              <Link
+                to="/login"
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Sign In
+              </Link>
             </div>
           </form>
         </div>
@@ -200,4 +204,3 @@ export default function Register() {
     </div>
   );
 }
-

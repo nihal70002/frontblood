@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const BASE_URL = "https://localhost:5001/api"; // Common base
+const BASE_URL = "http://localhost:5181/api"; // Common base
 
 // ----------------- Admin Profiles -----------------
 const ADMIN_URL = `${BASE_URL}/AdminProfiles`;
 
-export const getAllAdminProfiles = async () => axios.get(ADMIN_URL);
+export const getAllAdminProfiles = async ( ) => axios.get(ADMIN_URL);
 export const getAdminProfileById = async (id) => axios.get(`${ADMIN_URL}/${id}`);
 export const createAdminProfile = async (profile) => axios.post(ADMIN_URL, profile);
 export const updateAdminProfile = async (id, profile) => axios.put(`${ADMIN_URL}/${id}`, profile);

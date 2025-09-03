@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
@@ -9,10 +9,20 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear auth info
+    localStorage.removeItem("token");
+    localStorage.removeItem("userRole");
+    // Redirect to login
+    navigate("/login");
+  };
+
   return (
     <div className="flex min-h-screen bg-gradient-to-br from-indigo-50 to-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-white shadow-xl flex flex-col">
+      <aside className="w-64 bg-white shadow-xl flex flex-col h-screen">
         <div className="p-6 border-b">
           <h1 className="text-2xl font-bold text-indigo-600 flex items-center gap-2">
             <LayoutDashboard className="w-7 h-7" />
@@ -20,7 +30,8 @@ export default function AdminDashboard() {
           </h1>
         </div>
 
-        <nav className="flex-1 p-4 space-y-2 text-gray-700">
+        {/* Scrollable menu */}
+        <nav className="flex-1 p-4 space-y-2 text-gray-700 overflow-y-auto">
           <Link
             to="/admin/profiles"
             className="flex items-center gap-3 p-3 rounded-lg hover:bg-indigo-100 hover:text-indigo-700 transition"
@@ -52,14 +63,18 @@ export default function AdminDashboard() {
             <Settings className="w-5 h-5" />
             Settings
           </Link>
-        </nav>
 
-        <div className="p-4 border-t">
-          <button className="flex items-center gap-3 w-full p-3 rounded-lg text-gray-600 hover:bg-red-100 hover:text-red-600 transition">
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
-        </div>
+          {/* Logout button moved up here */}
+          <div className="mt-6">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 w-full p-3 rounded-lg text-gray-600 hover:bg-red-100 hover:text-red-600 transition"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
+        </nav>
       </aside>
 
       {/* Main Content */}
