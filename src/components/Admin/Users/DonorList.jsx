@@ -1,22 +1,7 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 
-// Mock service functions for demo
-const getDonors = () => Promise.resolve({
-  data: [
-    { id: 1, name: "John Smith", bloodGroup: "A+", contact: "+1 234-567-8900" },
-    { id: 2, name: "Sarah Johnson", bloodGroup: "O-", contact: "+1 234-567-8901" },
-    { id: 3, name: "Michael Brown", bloodGroup: "B+", contact: "+1 234-567-8902" },
-    { id: 4, name: "Emily Davis", bloodGroup: "AB+", contact: "+1 234-567-8903" },
-    { id: 5, name: "David Wilson", bloodGroup: "O+", contact: "+1 234-567-8904" },
-    { id: 6, name: "Lisa Anderson", bloodGroup: "A-", contact: "+1 234-567-8905" }
-  ]
-});
-
-const createDonor = (donor) => Promise.resolve({
-  data: { ...donor, id: Date.now() }
-});
-
-const deleteDonor = (id) => Promise.resolve();
+const API_URL = "http://localhost:5181/api/Donors"; // 👈 change if your API endpoint differs
 
 export default function DonorList() {
   const [donors, setDonors] = useState([]);
@@ -29,12 +14,44 @@ export default function DonorList() {
     fetchDonors();
   }, []);
 
-  const fetchDonors = () => {
-    setLoading(true);
-    getDonors()
-      .then((res) => setDonors(res.data))
-      .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+  // ✅ Fetch donors
+  const fetchDonors = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(API_URL);
+      setDonors(res.data);
+    } catch (err) {
+      console.error("Error fetching donors:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Add donor
+  const handleAddDonor = async () => {
+    if (!newDonor.name.trim() || !newDonor.contact.trim()) return;
+
+    setAdding(true);
+    try {
+      const res = await axios.post(API_URL, newDonor);
+      setDonors((prev) => [...prev, res.data]);
+      setNewDonor({ name: "", bloodGroup: "A+", contact: "" });
+    } catch (err) {
+      console.error("Error adding donor:", err);
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  // ✅ Delete donor
+  const handleDeleteDonor = async (id) => {
+    if (!confirm("Are you sure you want to delete this donor?")) return;
+    try {
+      await axios.delete(`${API_URL}/${id}`);
+      setDonors((prev) => prev.filter((d) => d.id !== id));
+    } catch (err) {
+      console.error("Error deleting donor:", err);
+    }
   };
 
   const bloodGroupColor = (group) => {
@@ -57,31 +74,6 @@ export default function DonorList() {
     selectedBloodGroup === "All"
       ? donors
       : donors.filter((d) => d.bloodGroup === selectedBloodGroup);
-
-  const handleAddDonor = async () => {
-    if (!newDonor.name.trim() || !newDonor.contact.trim()) return;
-
-    setAdding(true);
-    try {
-      const res = await createDonor(newDonor);
-      setDonors((prev) => [...prev, res.data]);
-      setNewDonor({ name: "", bloodGroup: "A+", contact: "" });
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setAdding(false);
-    }
-  };
-
-  const handleDeleteDonor = async (id) => {
-    if (!confirm("Are you sure you want to delete this donor?")) return;
-    try {
-      await deleteDonor(id);
-      setDonors((prev) => prev.filter((d) => d.id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
 
   const bloodGroupCounts = donors.reduce((acc, donor) => {
     acc[donor.bloodGroup] = (acc[donor.bloodGroup] || 0) + 1;
@@ -136,7 +128,7 @@ export default function DonorList() {
                 className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Blood Group</label>
               <select
@@ -149,7 +141,7 @@ export default function DonorList() {
                 ))}
               </select>
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Contact</label>
               <input
@@ -160,7 +152,7 @@ export default function DonorList() {
                 className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
               />
             </div>
-            
+
             <div className="flex items-end">
               <button
                 onClick={handleAddDonor}
@@ -194,7 +186,7 @@ export default function DonorList() {
               ))}
             </select>
           </div>
-          
+
           <div className="text-sm text-slate-600">
             Showing {filteredDonors.length} of {totalDonors} donors
           </div>
@@ -239,7 +231,7 @@ export default function DonorList() {
                       <td className="p-6">
                         <div className="flex items-center space-x-3">
                           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold">
-                            {donor.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                            {donor.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
                           </div>
                           <div>
                             <div className="font-semibold text-slate-800">{donor.name}</div>
