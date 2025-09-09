@@ -4,7 +4,6 @@ import { loginUser } from "../services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [focusedField, setFocusedField] = useState("");
@@ -54,30 +53,17 @@ export default function Login() {
       const response = await loginUser({ Email: email, Password: password });
 
       const message = response.Message || response.message;
-      const user = response.user || {};
-      const token = response.token || "";
-      console.log(response.role);
 
       if (message?.toLowerCase().includes("success")) {
-        const userData = {
-          name: user.name || email,
-          email,
-          role: user.role || "User",
-          token,
-        };
+        // ✅ Save full user object returned from backend
+        localStorage.setItem("user", JSON.stringify(response));
 
-        localStorage.setItem("user", JSON.stringify(userData));
         alert("Login successful!");
 
         // ✅ Role-based redirect
-        const role = response.role.toLowerCase();
-        console.log(role)
+        const role = response.role?.toLowerCase() || "user";
         if (role === "admin") {
           navigate("/admin");
-        } else if (role === "donor") {
-          navigate("/");
-        } else if (role === "receiver") {
-          navigate("/");
         } else {
           navigate("/");
         }

@@ -128,6 +128,7 @@ export default function DonorList() {
                 className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-white/50"
               />
             </div>
+            
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Blood Group</label>
@@ -141,6 +142,8 @@ export default function DonorList() {
                 ))}
               </select>
             </div>
+
+            
 
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-700">Contact</label>
